@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   BarChart2, Users, MousePointerClick, Eye, Globe,
-  TrendingDown, LogOut, Calendar, RefreshCw, Sun, Moon,
+  TrendingDown, LogOut, Calendar, RefreshCw, Sun, Moon, LayoutDashboard, Search,
 } from 'lucide-react'
 import { MetricCard } from '@/components/MetricCard'
 import { TrafficChart } from '@/components/TrafficChart'
@@ -67,7 +67,7 @@ export default function DashboardPage() {
             </a>
           </div>
 
-          {/* Right: data date + theme toggle + logout */}
+          {/* Right: data date + gsc link + theme toggle + logout */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-400 dark:text-slate-500">
               <RefreshCw className="w-3 h-3" />
@@ -95,6 +95,32 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5">
+
+        {/* ── Report Navigation ── */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-3 bg-blue-500 text-white rounded-2xl px-4 py-3.5 shadow-sm shadow-blue-500/20">
+            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+              <LayoutDashboard className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm leading-tight">Google Analytics</p>
+              <p className="text-blue-100 text-xs mt-0.5 truncate">Traffic &amp; audience</p>
+            </div>
+          </div>
+          <a
+            href="/search-console"
+            className="flex items-center gap-3 bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-500/40 text-gray-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-2xl px-4 py-3.5 transition-all group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-slate-800 group-hover:bg-blue-50 dark:group-hover:bg-blue-500/10 flex items-center justify-center flex-shrink-0 transition-colors">
+              <Search className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm leading-tight">Search Console</p>
+              <p className="text-gray-400 dark:text-slate-500 text-xs mt-0.5 truncate">SEO &amp; rankings</p>
+            </div>
+          </a>
+        </div>
+
         {/* Page title + period selector */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -111,11 +137,10 @@ export default function DashboardPage() {
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                  period === p
-                    ? 'bg-blue-500 text-white shadow-sm'
-                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
-                }`}
+                className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${period === p
+                  ? 'bg-blue-500 text-white shadow-sm'
+                  : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
               >
                 {p === '7d' ? '7 days' : p === '30d' ? '30 days' : '90 days'}
               </button>
@@ -126,6 +151,13 @@ export default function DashboardPage() {
         <p className="text-xs text-gray-400 dark:text-slate-500 -mt-2">
           {periodLabels[period]} · compared to previous {period === '7d' ? '7' : period === '30d' ? '30' : '90'} days
         </p>
+
+        {/* AI Summary + Insights */}
+        <InsightsSection
+          insights={data.insights}
+          recommendations={data.recommendations}
+          summary={data.aiSummary}
+        />
 
         {/* KPI Cards — 2 cols mobile, 3 cols tablet, 6 cols desktop */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -168,13 +200,6 @@ export default function DashboardPage() {
 
         {/* Top Queries */}
         <TopQueriesTable data={data.topQueries} />
-
-        {/* AI Insights */}
-        <InsightsSection
-          insights={data.insights}
-          recommendations={data.recommendations}
-          summary={data.aiSummary}
-        />
 
         {/* Footer */}
         <footer className="border-t border-gray-200 dark:border-slate-800 pt-5 pb-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400 dark:text-slate-600">

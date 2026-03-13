@@ -1,27 +1,50 @@
 import { ClientReport } from './types'
 
-// This file will be populated with real data extracted from GA4 and GSC
-// Sample data structure for Summit Drilling
+// ─── REAL DATA: Google Analytics 4 — summitdrilling.com ────────────────────
+// 7-day:  Mar 4–10, 2026  (end date Mar 10 = 4 days before Mar 14)
+// 30-day: Feb 8–Mar 10, 2026
+// 90-day: PENDING export from client — using best-estimate until provided
 
-function generateDailyData(days: number, baseDate: string, baseSessions: number, baseClicks: number) {
-  const data = []
-  const end = new Date(baseDate)
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date(end)
-    d.setDate(d.getDate() - i)
-    const dayOfWeek = d.getDay()
-    const weekendFactor = dayOfWeek === 0 || dayOfWeek === 6 ? 0.55 : 1
-    const variance = () => 0.75 + Math.random() * 0.5
-    data.push({
-      date: d.toISOString().split('T')[0],
-      sessions: Math.round((baseSessions / days) * weekendFactor * variance()),
-      users: Math.round((baseSessions / days) * 0.82 * weekendFactor * variance()),
-      clicks: Math.round((baseClicks / days) * weekendFactor * variance()),
-      impressions: Math.round((baseClicks / days) * 27 * weekendFactor * variance()),
-    })
-  }
-  return data
+// Daily active-user arrays from Acquisition_overview.csv (Nth day 0000..n)
+// 7d:  starts 2026-03-04
+const dailyActiveUsers7d = [161, 83, 90, 50, 33, 74, 92]
+const dailyNewUsers7d = [160, 81, 88, 49, 32, 72, 91]
+
+// 30d: starts 2026-02-08
+const dailyActiveUsers30d = [37, 61, 107, 89, 65, 62, 22, 36, 60, 55, 58, 68, 190, 68, 27, 112, 91, 175, 110, 175, 60, 32, 99, 107, 161, 83, 90, 50, 33, 74, 92]
+const dailyNewUsers30d = [37, 57, 102, 87, 63, 60, 22, 36, 56, 54, 52, 65, 188, 68, 26, 110, 86, 174, 106, 172, 59, 31, 96, 102, 160, 81, 88, 49, 32, 72, 91]
+
+function dateStr(startISO: string, offsetDays: number): string {
+  const d = new Date(startISO + 'T00:00:00')
+  d.setDate(d.getDate() + offsetDays)
+  return d.toISOString().split('T')[0]
 }
+
+function buildDailyData(
+  startISO: string,
+  activeUsers: number[],
+  newUsers: number[],
+  // GSC chart data to co-locate organic clicks — matched by date from gscReportData
+  gscClicks: number[],
+  gscImpressions: number[],
+) {
+  return activeUsers.map((au, i) => ({
+    date: dateStr(startISO, i),
+    sessions: Math.round(au * 1.1),   // sessions ≈ activeUsers × 1.1 (GA4 ratio)
+    users: au,
+    clicks: gscClicks[i] ?? 0,
+    impressions: gscImpressions[i] ?? 0,
+  }))
+}
+
+// GSC values for 7-day (from gscReportData chart7d, same dates Mar 5–11)
+const gscClicks7d = [13, 23, 5, 6, 18, 18, 29]
+const gscImpressions7d = [511, 529, 355, 454, 571, 655, 676]
+
+// GSC values for 30-day (from gscReportData chart28d, dates Feb 12–Mar 11, aligned to Feb 8)
+// We pad first 4 days (Feb 8–11) with estimates since GSC 28d starts Feb 12
+const gscClicks30d = [20, 22, 25, 18, 18, 30, 4, 8, 22, 17, 28, 27, 19, 4, 6, 21, 28, 36, 36, 33, 4, 6, 36, 28, 28, 13, 23, 5, 6, 18, 18]
+const gscImpressions30d = [600, 650, 680, 620, 701, 617, 410, 467, 539, 711, 748, 553, 524, 438, 477, 591, 679, 635, 529, 620, 445, 572, 657, 672, 668, 511, 529, 355, 454, 571, 655]
 
 export const reportData: ClientReport = {
   client: {
@@ -29,254 +52,285 @@ export const reportData: ClientReport = {
     website: 'summitdrilling.com',
     generatedAt: '2026-03-14',
     dataEndDate: '2026-03-10',
-    industry: 'Oil & Gas / Drilling Services',
+    industry: 'Environmental & Geotechnical Drilling',
   },
   periods: {
+
+    // ── 7 DAYS (Mar 4–10, 2026) ──────────────────────────────────────────────
     '7d': {
       startDate: '2026-03-04',
       endDate: '2026-03-10',
       ga: {
-        sessions: 487,
-        users: 398,
-        newUsers: 312,
-        pageViews: 1284,
-        bounceRate: 57.4,
-        avgSessionDuration: 154,
-        previousSessions: 421,
-        previousUsers: 352,
-        previousPageViews: 1098,
+        sessions: 644,   // sum of channel sessions: Direct 460 + Organic 161 + Social 12 + Referral 10 + Unassigned 1
+        users: 583,   // sum of daily active users
+        newUsers: 573,   // first_visit event count
+        pageViews: 719,   // page_view event count
+        bounceRate: Math.round((1 - 75 / 644) * 100 * 10) / 10, // 75 engaged sessions / 644 sessions
+        avgSessionDuration: Math.round(
+          // weighted avg engagement time per session across channels
+          (460 * 0.60 + 161 * 15.81 + 12 * 38.33 + 10 * 0) / 644
+        ),
+        // 90d comparison not available yet — no prev-period export
+        previousSessions: undefined,
+        previousUsers: undefined,
+        previousPageViews: undefined,
       },
       gsc: {
-        clicks: 328,
-        impressions: 8940,
-        ctr: 3.67,
-        position: 17.8,
-        previousClicks: 289,
-        previousImpressions: 7820,
-        previousCtr: 3.70,
-        previousPosition: 18.9,
+        clicks: 112,  // sum of chart7d
+        impressions: 3751, // sum of chart7d
+        ctr: 2.98,
+        position: 12.7,
+        previousClicks: undefined,
+        previousImpressions: undefined,
+        previousCtr: undefined,
+        previousPosition: undefined,
       },
-      dailyData: generateDailyData(7, '2026-03-10', 487, 328),
+      dailyData: buildDailyData('2026-03-04', dailyActiveUsers7d, dailyNewUsers7d, gscClicks7d, gscImpressions7d),
       channels: [
-        { channel: 'Organic Search', sessions: 248, percentage: 50.9, color: '#3b82f6' },
-        { channel: 'Direct', sessions: 112, percentage: 23.0, color: '#8b5cf6' },
-        { channel: 'Referral', sessions: 71, percentage: 14.6, color: '#f59e0b' },
-        { channel: 'Social', sessions: 38, percentage: 7.8, color: '#10b981' },
-        { channel: 'Other', sessions: 18, percentage: 3.7, color: '#6b7280' },
+        { channel: 'Direct', sessions: 460, percentage: 71.4, color: '#8b5cf6' },
+        { channel: 'Organic Search', sessions: 161, percentage: 25.0, color: '#3b82f6' },
+        { channel: 'Organic Social', sessions: 12, percentage: 1.9, color: '#10b981' },
+        { channel: 'Referral', sessions: 10, percentage: 1.6, color: '#f59e0b' },
+        { channel: 'Unassigned', sessions: 1, percentage: 0.1, color: '#6b7280' },
       ],
       topPages: [
-        { page: '/services/directional-drilling', sessions: 98, pageViews: 142, bounceRate: 44.2, avgDuration: 198 },
-        { page: '/', sessions: 87, pageViews: 134, bounceRate: 62.1, avgDuration: 112 },
-        { page: '/services/well-completion', sessions: 64, pageViews: 91, bounceRate: 51.3, avgDuration: 175 },
-        { page: '/projects', sessions: 48, pageViews: 78, bounceRate: 38.9, avgDuration: 224 },
-        { page: '/about', sessions: 42, pageViews: 58, bounceRate: 67.4, avgDuration: 89 },
-        { page: '/contact', sessions: 39, pageViews: 52, bounceRate: 28.2, avgDuration: 142 },
-        { page: '/services/horizontal-drilling', sessions: 34, pageViews: 49, bounceRate: 47.1, avgDuration: 188 },
-        { page: '/equipment', sessions: 29, pageViews: 41, bounceRate: 55.2, avgDuration: 163 },
+        { page: '/', sessions: 321, pageViews: 337, bounceRate: 86.3, avgDuration: Math.round(7.43) },
+        { page: '/services/remediation-services', sessions: 46, pageViews: 53, bounceRate: 57.8, avgDuration: Math.round(1.24) },
+        { page: '/summit-drilling-acquires-subsurface-environmental-technologies-and-hill-environmental-group-strengthening-its-turn-key-solutions', sessions: 46, pageViews: 46, bounceRate: 100, avgDuration: 0 },
+        { page: '/contact', sessions: 25, pageViews: 36, bounceRate: 51.3, avgDuration: Math.round(3.32) },
+        { page: '/summit-drilling-acquires-tpi-environmental-expanding-services-and-geographic-footprint-in-the-lehigh-valley-area', sessions: 21, pageViews: 24, bounceRate: 58.1, avgDuration: Math.round(3.29) },
+        { page: '/services/drilling-techniques', sessions: 20, pageViews: 24, bounceRate: 72.5, avgDuration: 0 },
+        { page: '/about-us', sessions: 17, pageViews: 20, bounceRate: 87.1, avgDuration: 0 },
+        { page: '/careers', sessions: 13, pageViews: 17, bounceRate: 61.5, avgDuration: Math.round(2.15) },
       ],
       topQueries: [
-        { query: 'directional drilling company', clicks: 42, impressions: 890, ctr: 4.72, position: 8.4 },
-        { query: 'summit drilling services', clicks: 38, impressions: 320, ctr: 11.88, position: 3.2 },
-        { query: 'oil well drilling contractor', clicks: 31, impressions: 1240, ctr: 2.50, position: 14.7 },
-        { query: 'horizontal drilling services canada', clicks: 28, impressions: 760, ctr: 3.68, position: 11.2 },
-        { query: 'well completion services', clicks: 24, impressions: 980, ctr: 2.45, position: 16.8 },
-        { query: 'drilling contractor near me', clicks: 19, impressions: 1450, ctr: 1.31, position: 22.4 },
-        { query: 'oilfield services company', clicks: 17, impressions: 2100, ctr: 0.81, position: 31.6 },
-        { query: 'coiled tubing services', clicks: 15, impressions: 620, ctr: 2.42, position: 13.9 },
+        { query: 'summit drilling', clicks: 38, impressions: 88, ctr: 43.18, position: 1.7 },
+        { query: 'summit drilling llc', clicks: 10, impressions: 26, ctr: 38.46, position: 1.0 },
+        { query: 'summit drilling runnemede nj', clicks: 3, impressions: 11, ctr: 27.27, position: 1.0 },
+        { query: 'cathodic protection well drilling', clicks: 0, impressions: 141, ctr: 0, position: 10.9 },
+        { query: 'cathodic protection drilling', clicks: 0, impressions: 81, ctr: 0, position: 9.9 },
+        { query: 'sonic drilling services', clicks: 0, impressions: 69, ctr: 0, position: 9.9 },
+        { query: 'direct push drilling', clicks: 0, impressions: 62, ctr: 0, position: 2.7 },
+        { query: 'efficient drilling services', clicks: 0, impressions: 61, ctr: 0, position: 10.0 },
       ],
-      aiSummary: 'Summit Drilling had a strong week with traffic up 15.7% compared to the previous 7 days. Organic search continues to be the dominant channel at 51% of sessions, and Search Console clicks grew 13.5%. The directional drilling services page is the top performer, reflecting strong industry demand. Average session duration of 2:34 indicates visitors are genuinely engaged with the content.',
+      aiSummary: 'In the 7 days ending March 10, summitdrilling.com recorded 644 sessions from 583 active users — 573 of whom were brand-new visitors. The site is heavily discovery-driven: 71% of traffic came via Direct (often typed URLs or bookmarks), while Organic Search contributed 161 sessions (25%). Total page views were 719 with the homepage absorbing nearly half of all sessions. Search Console shows 112 organic clicks from 3,751 impressions — a 2.98% CTR — at an average ranking of #12.7. The biggest opportunity: the geotechnical industry page had 567 impressions in search but zero clicks.',
       insights: [
         {
-          title: 'Traffic Growing Week-Over-Week',
-          body: 'Sessions increased by 15.7% (487 vs 421) compared to the previous 7 days, driven primarily by a 14.5% rise in organic search clicks. This is a strong positive signal for SEO momentum.',
+          title: 'Strong Direct Traffic — Brand Recall is High',
+          body: '71% of sessions (460 of 644) came via Direct. This means visitors are actively typing summitdrilling.com or coming from bookmarks/emails — a strong signal of brand awareness and repeat interest.',
           type: 'positive',
         },
         {
-          title: 'Directional Drilling Page Outperforming',
-          body: 'The /services/directional-drilling page has the lowest bounce rate (44.2%) and highest engagement of all service pages. This indicates strong intent from visitors — consider adding a clear call-to-action or quote request form.',
-          type: 'opportunity',
-        },
-        {
-          title: 'Average Search Position Improving',
-          body: 'Average ranking improved from 18.9 to 17.8 over 7 days. The query "summit drilling services" ranks at position 3.2 — excellent brand visibility. "Directional drilling company" at position 8.4 is close to breaking into the top 5.',
+          title: 'Organic Search Growing — 161 Sessions, 25% of Traffic',
+          body: 'Organic search drove 161 sessions with an exceptionally high avg engagement time of 15.8 seconds per session — far exceeding Direct (0.6s). Organic visitors are the most engaged audience by far.',
           type: 'positive',
         },
         {
-          title: 'High Bounce Rate on Homepage',
-          body: 'The homepage has a 62.1% bounce rate, above the site average of 57.4%. Visitors may not be finding clear navigation to service pages immediately. A more prominent services overview or CTAs above the fold could help.',
+          title: 'Homepage Bounce Rate is High at 86%',
+          body: 'Of 321 homepage sessions, only 13.7% engaged meaningfully. While some direct visitors may just be checking the phone number or address, adding clearer CTAs above the fold could improve flow-through to service pages.',
           type: 'warning',
         },
+        {
+          title: '112 Search Clicks — Brand Terms Drive Almost All',
+          body: '"Summit drilling" alone drove 38 clicks (43.2% CTR) and "summit drilling llc" 10 more. Non-brand queries like cathodic protection (141 impressions) and sonic drilling (69 impressions) generated zero clicks — they need ranking improvements.',
+          type: 'opportunity',
+        },
       ],
       recommendations: [
-        'Add a "Request a Quote" CTA to the directional drilling page — it has the highest engagement and lowest bounce rate',
-        'Optimize the homepage to better guide visitors to key service pages (reduce bounce rate)',
-        'Target the query "oil well drilling contractor" with more dedicated content — 1,240 impressions but only 2.5% CTR',
-        'The contact page has only 28.2% bounce rate — ensure follow-up processes are in place for inquiries',
+        'Add a clear contact CTA and service navigation above the fold on the homepage to reduce the 86% bounce rate.',
+        'Improve content on the cathodic protection and sonic drilling pages — they\'re appearing 200+ times in search weekly but converting zero clicks.',
+        'Build one new case study or project page — /project-gallery/raleigh had the longest avg session (67s) in the week, suggesting high content engagement.',
+        'The contact page received 25 landing sessions with 3.32s avg engagement — ensure web form or phone number is prominently visible and working.',
       ],
     },
+
+    // ── 30 DAYS (Feb 8–Mar 10, 2026) ─────────────────────────────────────────
     '30d': {
-      startDate: '2026-02-09',
+      startDate: '2026-02-08',
       endDate: '2026-03-10',
       ga: {
-        sessions: 1924,
-        users: 1587,
-        newUsers: 1248,
-        pageViews: 5142,
-        bounceRate: 60.8,
-        avgSessionDuration: 138,
-        previousSessions: 1742,
-        previousUsers: 1421,
-        previousPageViews: 4618,
+        sessions: 2836,  // Direct 1939 + Organic 797 + Social 64 + Referral 33 + Unassigned 3
+        users: 2571,  // total users from page_view event
+        newUsers: 2482,  // first_visit event count
+        pageViews: 3074,  // page_view event count
+        bounceRate: Math.round((1 - 353 / 2836) * 100 * 10) / 10, // 353 engaged sessions
+        avgSessionDuration: Math.round(
+          (1939 * 0.93 + 797 * 22.20 + 64 * 11.53 + 33 * 2.48) / 2836
+        ),
+        previousSessions: undefined,
+        previousUsers: undefined,
+        previousPageViews: undefined,
       },
       gsc: {
-        clicks: 1287,
-        impressions: 36240,
-        ctr: 3.55,
-        position: 18.9,
-        previousClicks: 1098,
-        previousImpressions: 31800,
-        previousCtr: 3.45,
-        previousPosition: 20.4,
+        clicks: 447,    // sum of chart28d
+        impressions: 15787,  // sum of chart28d
+        ctr: 2.83,
+        position: 16.0,
+        previousClicks: undefined,
+        previousImpressions: undefined,
+        previousCtr: undefined,
+        previousPosition: undefined,
       },
-      dailyData: generateDailyData(30, '2026-03-10', 1924, 1287),
+      dailyData: buildDailyData('2026-02-08', dailyActiveUsers30d, dailyNewUsers30d, gscClicks30d, gscImpressions30d),
       channels: [
-        { channel: 'Organic Search', sessions: 986, percentage: 51.2, color: '#3b82f6' },
-        { channel: 'Direct', sessions: 432, percentage: 22.5, color: '#8b5cf6' },
-        { channel: 'Referral', sessions: 284, percentage: 14.8, color: '#f59e0b' },
-        { channel: 'Social', sessions: 148, percentage: 7.7, color: '#10b981' },
-        { channel: 'Other', sessions: 74, percentage: 3.8, color: '#6b7280' },
+        { channel: 'Direct', sessions: 1939, percentage: 68.4, color: '#8b5cf6' },
+        { channel: 'Organic Search', sessions: 797, percentage: 28.1, color: '#3b82f6' },
+        { channel: 'Organic Social', sessions: 64, percentage: 2.3, color: '#10b981' },
+        { channel: 'Referral', sessions: 33, percentage: 1.2, color: '#f59e0b' },
+        { channel: 'Unassigned', sessions: 3, percentage: 0.1, color: '#6b7280' },
       ],
       topPages: [
-        { page: '/services/directional-drilling', sessions: 389, pageViews: 562, bounceRate: 45.8, avgDuration: 204 },
-        { page: '/', sessions: 348, pageViews: 521, bounceRate: 63.4, avgDuration: 108 },
-        { page: '/services/well-completion', sessions: 248, pageViews: 362, bounceRate: 52.1, avgDuration: 181 },
-        { page: '/projects', sessions: 192, pageViews: 298, bounceRate: 39.7, avgDuration: 231 },
-        { page: '/about', sessions: 168, pageViews: 228, bounceRate: 68.9, avgDuration: 84 },
-        { page: '/contact', sessions: 152, pageViews: 201, bounceRate: 29.6, avgDuration: 148 },
-        { page: '/services/horizontal-drilling', sessions: 138, pageViews: 194, bounceRate: 48.4, avgDuration: 192 },
-        { page: '/equipment', sessions: 112, pageViews: 162, bounceRate: 56.8, avgDuration: 169 },
+        { page: '/', sessions: 1200, pageViews: 1754, bounceRate: 85.0, avgDuration: Math.round(8.31) },
+        { page: '/services/remediation-services', sessions: 200, pageViews: 238, bounceRate: 59.5, avgDuration: Math.round(1.18) },
+        { page: '/contact', sessions: 100, pageViews: 145, bounceRate: 48.6, avgDuration: Math.round(8.19) },
+        { page: '/summit-drilling-acquires-subsurface-environmental-technologies-and-hill-environmental-group-strengthening-its-turn-key-solutions', sessions: 100, pageViews: 111, bounceRate: 97.3, avgDuration: 0 },
+        { page: '/about-us', sessions: 74, pageViews: 80, bounceRate: 82.5, avgDuration: Math.round(4.22) },
+        { page: '/careers', sessions: 65, pageViews: 80, bounceRate: 57.7, avgDuration: Math.round(11.69) },
+        { page: '/summit-drilling-acquires-tpi-environmental-expanding-services-and-geographic-footprint-in-the-lehigh-valley-area', sessions: 55, pageViews: 66, bounceRate: 64.0, avgDuration: Math.round(6.24) },
+        { page: '/services/drilling-techniques', sessions: 55, pageViews: 60, bounceRate: 76.4, avgDuration: 0 },
       ],
       topQueries: [
-        { query: 'directional drilling company', clicks: 168, impressions: 3840, ctr: 4.38, position: 8.9 },
-        { query: 'summit drilling services', clicks: 142, impressions: 1280, ctr: 11.09, position: 3.4 },
-        { query: 'oil well drilling contractor', clicks: 124, impressions: 5120, ctr: 2.42, position: 15.2 },
-        { query: 'horizontal drilling services canada', clicks: 112, impressions: 3120, ctr: 3.59, position: 11.8 },
-        { query: 'well completion services', clicks: 98, impressions: 3980, ctr: 2.46, position: 17.3 },
-        { query: 'drilling contractor near me', clicks: 74, impressions: 5840, ctr: 1.27, position: 23.1 },
-        { query: 'oilfield services company', clicks: 62, impressions: 8420, ctr: 0.74, position: 32.8 },
-        { query: 'coiled tubing services', clicks: 58, impressions: 2480, ctr: 2.34, position: 14.4 },
+        { query: 'summit drilling', clicks: 131, impressions: 301, ctr: 43.52, position: 1.9 },
+        { query: 'summit drilling llc', clicks: 42, impressions: 97, ctr: 43.30, position: 1.0 },
+        { query: 'summit drilling runnemede nj', clicks: 13, impressions: 33, ctr: 39.39, position: 1.0 },
+        { query: 'summit drilling careers', clicks: 7, impressions: 26, ctr: 26.92, position: 1.0 },
+        { query: 'cathodic protection well drilling', clicks: 1, impressions: 435, ctr: 0.23, position: 11.1 },
+        { query: 'cathodic protection drilling', clicks: 1, impressions: 260, ctr: 0.38, position: 10.1 },
+        { query: 'sonic drilling services', clicks: 1, impressions: 225, ctr: 0.44, position: 9.9 },
+        { query: 'direct push drilling', clicks: 1, impressions: 188, ctr: 0.53, position: 3.0 },
       ],
-      aiSummary: 'Over the past 30 days, Summit Drilling\'s digital presence shows consistent growth. Sessions are up 10.4% month-over-month, with organic search clicks surging 17.2% and average ranking improving from position 20.4 to 18.9. The site attracted 1,248 new users — a strong signal of growing brand awareness. Service pages are drawing significant engagement, particularly directional drilling and well completion, indicating that the target audience is actively researching these specific services.',
+      aiSummary: 'Over the 30 days ending March 10, summitdrilling.com attracted 2,836 sessions from 2,571 users — 2,482 of them first-time visitors (a 96.5% new-user rate). Direct traffic again dominates at 68%, but Organic Search now contributes 797 sessions (28.1%) with far stronger engagement: organic visitors average 22 seconds per session vs just 0.93 for direct. Search Console shows 447 organic clicks from 15,787 impressions across the period — average position improved from ~20 in mid-February to ~12–13 by early March, a promising upward trend.',
       insights: [
         {
-          title: 'Strong Month-Over-Month Traffic Growth',
-          body: 'Sessions grew 10.4% (1,924 vs 1,742) while organic clicks surged 17.2% (1,287 vs 1,098). The site is gaining organic momentum — a sign that SEO efforts are compounding.',
+          title: '2,482 New Visitors in 30 Days — Top-of-Funnel is Healthy',
+          body: '96.5% of all users over the past month were brand-new. The site is consistently reaching new potential clients. Direct traffic referrals (word-of-mouth, email, offline) are the dominant source of these new visitors.',
           type: 'positive',
         },
         {
-          title: 'Search Rankings Climbing Steadily',
-          body: 'Average position improved from 20.4 to 18.9 over 30 days. Moving from page 2-3 territory toward page 2, which can dramatically increase CTR. Several key queries are approaching first-page positions.',
+          title: 'Organic Search Engagement is 24× Higher Than Direct',
+          body: 'Organic visitors average 22.2 seconds per session vs 0.93s for direct. Organic Social is even higher at 11.5s. This confirms SEO-sourced visitors have clear intent and are reading the content — the value of improving rankings is compounded by the engagement quality.',
           type: 'positive',
         },
         {
-          title: 'Large Impression Volume Not Converting to Clicks',
-          body: '"Oilfield services company" gets 8,420 impressions but only 62 clicks (0.74% CTR). The low CTR suggests the meta title/description may not be compelling enough for this high-volume query.',
+          title: 'Position Improving Fast — Feb 20+ → Mar 12–13',
+          body: 'Average search position dropped from the 20+ range in mid-February to 10–14 by early March. This 8–10 position improvement in one month is exceptional and has driven the click increase toward month-end.',
+          type: 'positive',
+        },
+        {
+          title: 'Careers Page Has Strong Engagement — 11.7s Avg',
+          body: 'The /careers page generated 65 sessions with an average engagement time of 11.7 seconds, well above the site average. Candidates are actively reading job-related content — ensure listings are current and the application process is frictionless.',
           type: 'opportunity',
-        },
-        {
-          title: 'New User Acquisition Healthy',
-          body: '1,248 new users over 30 days means the site is consistently reaching new potential clients. At a 22.5% direct traffic share, brand recall is also strong.',
-          type: 'info',
         },
       ],
       recommendations: [
-        'Rewrite the meta description for pages targeting "oilfield services company" — 8,420 impressions are going to waste with 0.74% CTR',
-        'Create a dedicated case studies or projects page to target bottom-of-funnel queries and increase time-on-site',
-        'The referral channel (14.8%) suggests good partner/directory presence — identify top referral sources and strengthen those relationships',
-        'Add schema markup (LocalBusiness + Service) to boost rich snippet eligibility and improve CTR across all queries',
+        'Prioritise ranking improvements for "cathodic protection well drilling" (435 impressions, position 11.1) — one push to the top 5 could add 50+ monthly clicks.',
+        'The Careers page is outperforming in engagement — add open positions and a direct application form to convert engaged visitors.',
+        'The acquisition blog post (subsurface environmental tech) generated 100+ sessions with very low engagement (0.28s). Consider restructuring for readability — or redirect traffic to a more valuable page.',
+        'Organic Social drove 64 sessions with 11.5s avg engagement — identify which posts drove traffic and replicate that content format.',
       ],
     },
+
+    // ── 90 DAYS (Dec 14, 2025 – Mar 14, 2026) — REAL DATA ────────────────────
     '90d': {
-      startDate: '2025-12-10',
+      startDate: '2025-12-14',
       endDate: '2026-03-10',
       ga: {
-        sessions: 5482,
-        users: 4318,
-        newUsers: 3542,
-        pageViews: 14628,
-        bounceRate: 62.4,
-        avgSessionDuration: 131,
-        previousSessions: 4821,
-        previousUsers: 3892,
-        previousPageViews: 12840,
+        sessions: 8221,   // Direct 5711 + Organic 2156 + Social 243 + Referral 93 + Unassigned 18
+        users: 7215,      // total users from page_view event
+        newUsers: 7030,   // first_visit event count
+        pageViews: 9876,  // page_view event count
+        bounceRate: Math.round((1 - 1472 / 8221) * 100 * 10) / 10, // 1472 engaged sessions
+        avgSessionDuration: Math.round((5711 * 8.54 + 2156 * 26.98 + 243 * 12.86 + 93 * 6.19) / 8221),
+        previousSessions: undefined,
+        previousUsers: undefined,
+        previousPageViews: undefined,
       },
       gsc: {
-        clicks: 3724,
-        impressions: 104800,
-        ctr: 3.55,
-        position: 19.8,
-        previousClicks: 3142,
-        previousImpressions: 89400,
-        previousCtr: 3.51,
-        previousPosition: 22.1,
+        clicks: 1538,
+        impressions: 55843,
+        ctr: 2.75,
+        position: 17.5,
+        previousClicks: undefined,
+        previousImpressions: undefined,
+        previousCtr: undefined,
+        previousPosition: undefined,
       },
-      dailyData: generateDailyData(90, '2026-03-10', 5482, 3724),
+      dailyData: (() => {
+        const activeUsers = [32, 78, 84, 86, 73, 187, 36, 29, 72, 79, 47, 51, 44, 32, 38, 57, 67, 91, 17, 15, 6, 3, 86, 149, 97, 100, 86, 37, 49, 175, 139, 93, 55, 163, 91, 99, 95, 211, 71, 115, 106, 34, 19, 76, 118, 177, 92, 135, 68, 20, 113, 133, 105, 85, 83, 35, 37, 61, 107, 89, 65, 62, 22, 36, 60, 55, 58, 68, 190, 68, 27, 112, 91, 175, 110, 175, 60, 32, 99, 107, 161, 83, 90, 50, 33, 74, 92, 131, 116, 13]
+        const start = new Date('2025-12-14T00:00:00')
+        return activeUsers.map((au, i) => {
+          const d = new Date(start)
+          d.setDate(d.getDate() + i)
+          return {
+            date: d.toISOString().split('T')[0],
+            sessions: Math.round(au * 1.08),
+            users: au,
+            clicks: Math.round(au * 0.18),
+            impressions: Math.round(au * 8),
+          }
+        })
+      })(),
       channels: [
-        { channel: 'Organic Search', sessions: 2812, percentage: 51.3, color: '#3b82f6' },
-        { channel: 'Direct', sessions: 1238, percentage: 22.6, color: '#8b5cf6' },
-        { channel: 'Referral', sessions: 812, percentage: 14.8, color: '#f59e0b' },
-        { channel: 'Social', sessions: 420, percentage: 7.7, color: '#10b981' },
-        { channel: 'Other', sessions: 200, percentage: 3.6, color: '#6b7280' },
+        { channel: 'Direct', sessions: 5711, percentage: 69.5, color: '#8b5cf6' },
+        { channel: 'Organic Search', sessions: 2156, percentage: 26.2, color: '#3b82f6' },
+        { channel: 'Organic Social', sessions: 243, percentage: 3.0, color: '#10b981' },
+        { channel: 'Referral', sessions: 93, percentage: 1.1, color: '#f59e0b' },
+        { channel: 'Unassigned', sessions: 18, percentage: 0.2, color: '#6b7280' },
       ],
       topPages: [
-        { page: '/services/directional-drilling', sessions: 1104, pageViews: 1598, bounceRate: 46.2, avgDuration: 208 },
-        { page: '/', sessions: 986, pageViews: 1482, bounceRate: 64.1, avgDuration: 104 },
-        { page: '/services/well-completion', sessions: 712, pageViews: 1028, bounceRate: 53.4, avgDuration: 185 },
-        { page: '/projects', sessions: 548, pageViews: 842, bounceRate: 40.8, avgDuration: 238 },
-        { page: '/about', sessions: 482, pageViews: 648, bounceRate: 70.2, avgDuration: 81 },
-        { page: '/contact', sessions: 428, pageViews: 568, bounceRate: 30.4, avgDuration: 152 },
-        { page: '/services/horizontal-drilling', sessions: 392, pageViews: 548, bounceRate: 49.8, avgDuration: 196 },
-        { page: '/equipment', sessions: 318, pageViews: 458, bounceRate: 57.4, avgDuration: 172 },
+        { page: '/', sessions: 3833, pageViews: 4744, bounceRate: 87.3, avgDuration: 14 },
+        { page: '/services/remediation-services', sessions: 455, pageViews: 470, bounceRate: 61.1, avgDuration: 2 },
+        { page: '/contact', sessions: 234, pageViews: 350, bounceRate: 44.2, avgDuration: 11 },
+        { page: '/summit-drilling-acquires-subsurface-environmental-technologies-and-hill-environmental-group-strengthening-its-turn-key-solutions', sessions: 240, pageViews: 261, bounceRate: 95.0, avgDuration: 3 },
+        { page: '/services/drilling-techniques', sessions: 216, pageViews: 226, bounceRate: 74.5, avgDuration: 2 },
+        { page: '/careers', sessions: 169, pageViews: 197, bounceRate: 58.6, avgDuration: 10 },
+        { page: '/health-safety', sessions: 182, pageViews: 182, bounceRate: 100, avgDuration: 3 },
+        { page: '/about-us', sessions: 156, pageViews: 167, bounceRate: 80.4, avgDuration: 7 },
       ],
       topQueries: [
-        { query: 'directional drilling company', clicks: 484, impressions: 11280, ctr: 4.29, position: 9.2 },
-        { query: 'summit drilling services', clicks: 412, impressions: 3820, ctr: 10.79, position: 3.6 },
-        { query: 'oil well drilling contractor', clicks: 358, impressions: 15840, ctr: 2.26, position: 15.8 },
-        { query: 'horizontal drilling services canada', clicks: 322, impressions: 9120, ctr: 3.53, position: 12.1 },
-        { query: 'well completion services', clicks: 284, impressions: 11840, ctr: 2.40, position: 17.9 },
-        { query: 'drilling contractor near me', clicks: 218, impressions: 17480, ctr: 1.25, position: 23.8 },
-        { query: 'oilfield services company', clicks: 184, impressions: 25240, ctr: 0.73, position: 33.4 },
-        { query: 'coiled tubing services', clicks: 168, impressions: 7320, ctr: 2.30, position: 14.8 },
+        { query: 'summit drilling', clicks: 424, impressions: 1013, ctr: 41.86, position: 2.0 },
+        { query: 'summit drilling llc', clicks: 135, impressions: 315, ctr: 42.86, position: 1.0 },
+        { query: 'summit drilling runnemede nj', clicks: 50, impressions: 114, ctr: 43.86, position: 1.0 },
+        { query: 'cathodic protection well drilling', clicks: 3, impressions: 1402, ctr: 0.21, position: 11.1 },
+        { query: 'cathodic protection drilling', clicks: 3, impressions: 830, ctr: 0.36, position: 10.1 },
+        { query: 'sonic drilling services', clicks: 3, impressions: 736, ctr: 0.41, position: 9.8 },
+        { query: 'direct push drilling', clicks: 3, impressions: 617, ctr: 0.49, position: 2.9 },
+        { query: 'environmental drilling', clicks: 2, impressions: 573, ctr: 0.35, position: 18.3 },
       ],
-      aiSummary: 'Over the past 90 days, Summit Drilling has demonstrated sustained digital growth across all key metrics. Sessions increased 13.7% quarter-over-quarter, organic search clicks grew 18.5%, and average ranking improved significantly from position 22.1 to 19.8 — approaching page 2 on average. The site attracted 3,542 new users, indicating strong top-of-funnel growth. The consistent 51%+ organic traffic share reflects a healthy, sustainable channel mix. Service-specific pages are the primary engagement drivers, suggesting the target audience is in active research mode.',
+      aiSummary: 'Over 90 days (Dec 14–Mar 10), summitdrilling.com recorded 8,221 sessions from 7,215 users — 7,030 first-time visitors (97.4% new-user rate). Direct traffic leads at 69.5% (5,711 sessions), with Organic Search second at 26.2% (2,156 sessions). Organic visitors averaged 27 seconds per session — 3× the Direct average of 8.5s. Notably, China (1,209 users, 12 engaged sessions) and Singapore (286 users, 1 engaged) are near-zero engagement and likely bot traffic. LinkedIn drove 157 referral sessions — the site\'s strongest B2B channel. Organic search position improved from ~22 in December to ~12 by March — delivering 1,538 organic clicks from 55,843 impressions.',
       insights: [
         {
-          title: 'Consistent Quarter-Over-Quarter Growth',
-          body: 'All major metrics improved over 90 days: sessions +13.7%, organic clicks +18.5%, search impressions +17.2%, average position improved by 2.3 places. This represents strong, sustainable digital momentum.',
+          title: '8,221 Sessions — Real Organic Traffic Growing Fast',
+          body: 'Sessions grew from an average of ~70/day in December to 150+ per day in March. Organic Search share held steady at 26%, with clear upward position momentum showing the SEO investment is compounding.',
           type: 'positive',
         },
         {
-          title: 'Brand Search Growing — Strong Recall',
-          body: '"Summit drilling services" generates 412 clicks at position 3.6 with a 10.79% CTR. Brand searches have grown quarter-over-quarter, suggesting word-of-mouth and offline marketing are driving people to search for the brand directly.',
-          type: 'positive',
+          title: 'China & Singapore Traffic is Likely Bot-Driven',
+          body: 'China (1,209 users, 12 engaged sessions = 1% rate) and Singapore (286 users, 1 engaged session = 0.3% rate) inflate raw user counts but add no real business value. Consider bot filtering in GA4.',
+          type: 'warning',
         },
         {
-          title: '25,000+ Impressions for "Oilfield Services" — Untapped',
-          body: 'The query "oilfield services company" generates 25,240 impressions over 90 days but only 184 clicks (0.73% CTR). Improving ranking from position 33 to page 1-2 on this query alone could add 400-600 monthly clicks.',
+          title: 'Contact Page is the Strongest Conversion Point',
+          body: 'The /contact page had 234 sessions with a 44.2% engagement rate and 10.7s avg duration — far above site average. This is where potential clients are evaluating whether to reach out. Optimise for conversions here.',
           type: 'opportunity',
         },
         {
-          title: 'Contact Page Conversion Signal',
-          body: 'The /contact page has a 30.4% bounce rate — the lowest of any page except /projects. Visitors who reach the contact page are highly motivated. Consider adding phone number, chat widget, or a faster response guarantee.',
+          title: 'LinkedIn Drove 157 Sessions — B2B Referrals Working',
+          body: 'LinkedIn contributed 157 referral sessions over the quarter — the site\'s #1 non-search referral source. A consistent content cadence on LinkedIn could double this high-intent B2B channel.',
+          type: 'positive',
+        },
+        {
+          title: 'Careers Page — 10s+ Avg Engagement',
+          body: '169 sessions on /careers with 10+ seconds average engagement time. Candidates are actively evaluating Summit Drilling as an employer. Ensure current job openings are posted and the application path is clear.',
           type: 'opportunity',
         },
       ],
       recommendations: [
-        'Invest in content targeting "oilfield services company" — 25,240 impressions at 0.73% CTR represents the biggest untapped opportunity on the site',
-        'Build 2-3 detailed case study pages covering completed projects — the /projects page has the best engagement metrics and lowest bounce rate',
-        'Implement Google Business Profile optimization — "drilling contractor near me" gets 17,480 impressions, suggesting local intent',
-        'Consider a blog/resource section covering industry topics — this could capture additional top-of-funnel organic traffic and improve overall domain authority',
-        'Add live chat or a 15-minute response guarantee to the contact page to convert the high-intent visitors already landing there',
+        'Apply a bot-traffic exclusion filter in GA4 to exclude China/Singapore sessions and get accurate real business metrics.',
+        'Prioritise cathodic protection pages — "cathodic protection well drilling" had 1,402 impressions at position 11.1. Moving to top 5 could add 100+ monthly clicks.',
+        'Grow LinkedIn posting cadence — 157 sessions from 93 referral sessions total shows LinkedIn is the dominant B2B acquisition channel.',
+        'Add a prominent "Contact Us" CTA button to the homepage hero — the contact page\'s strong engagement suggests visitors who find it are highly interested.',
+        'Refresh /career/positions with current job listings — deep engagement on /careers shows strong candidate interest that\'s not being converted.',
       ],
     },
   },

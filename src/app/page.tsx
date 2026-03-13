@@ -81,7 +81,7 @@ export default function LoginPage() {
                   type="text"
                   value={domain}
                   onChange={e => setDomain(e.target.value)}
-                  placeholder="e.g. summitdrilling.com"
+                  placeholder="e.g. nandann.com"
                   className="w-full bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-colors"
                   autoFocus
                   autoComplete="off"

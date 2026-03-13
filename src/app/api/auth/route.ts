@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
-  const { password } = await request.json()
+  const { password, domain } = await request.json()
   const correctPassword = process.env.REPORT_PASSWORD || 'nandann2024'
+  const correctDomain = process.env.REPORT_DOMAIN || 'summitdrilling.com'
 
-  if (password === correctPassword) {
+  if (password === correctPassword && domain === correctDomain) {
     const response = NextResponse.json({ success: true })
     response.cookies.set('nandann-auth', 'authenticated', {
       httpOnly: true,
