@@ -58,6 +58,15 @@ export interface Insight {
   type: 'positive' | 'warning' | 'info' | 'opportunity'
 }
 
+export interface WebOpportunity {
+  title: string
+  category: 'UX & Conversion' | 'SEO Content' | 'New Page' | 'Technical SEO' | 'Local SEO' | 'Mobile'
+  priority: 'high' | 'medium' | 'quick-win'
+  effort: 'Small' | 'Medium' | 'Large'
+  evidence: string
+  impact: string
+}
+
 export interface PeriodReport {
   startDate: string
   endDate: string
@@ -70,6 +79,7 @@ export interface PeriodReport {
   aiSummary: string
   insights: Insight[]
   recommendations: string[]
+  opportunities: WebOpportunity[]
 }
 
 export interface ClientReport {

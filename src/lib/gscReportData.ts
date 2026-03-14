@@ -1,4 +1,5 @@
 // Real Google Search Console data for summitdrilling.com
+import { WebOpportunity } from './types'
 // Extracted from CSV exports on 2026-03-14
 // Periods: Last 7 Days, Last 28 Days, Last 3 Months
 
@@ -61,6 +62,7 @@ export interface GscPeriodData {
     insights: GscInsight[]
     recommendations: string[]
     summary: string
+    opportunities: WebOpportunity[]
 }
 
 export interface GscInsight {
@@ -502,6 +504,129 @@ const recommendations3m: string[] = [
     'Implement schema markup (LocalBusiness, Service) across all industry and service pages to improve CTR via rich snippets.',
 ]
 
+// ─── OPPORTUNITIES ───────────────────────────────────────────────────────────
+
+const opportunities7d: WebOpportunity[] = [
+    {
+        title: 'Geotechnical Industry Page — Content & Meta Overhaul',
+        category: 'SEO Content',
+        priority: 'high',
+        effort: 'Medium',
+        evidence: '567 impressions this week at position #23 — the highest-impression page on the site with zero clicks.',
+        impact: 'Reaching page 1 for geotechnical queries could unlock 40–60 targeted clicks/week from project-ready buyers.',
+    },
+    {
+        title: 'Cathodic Protection Page — Title Tag & Content Fix',
+        category: 'SEO Content',
+        priority: 'high',
+        effort: 'Small',
+        evidence: '"Cathodic protection well drilling" — 141 impressions this week at position #10.9, zero clicks.',
+        impact: 'One position push to top 5 could add 15–20 high-value B2B clicks per week from a specialist query.',
+    },
+    {
+        title: 'Homepage Meta Description — Improve CTR',
+        category: 'Technical SEO',
+        priority: 'quick-win',
+        effort: 'Small',
+        evidence: 'Homepage: 1,701 impressions at position 12.4 with only 3.23% CTR — industry average for position 12 is ~2%, but compelling copy can reach 5–6%.',
+        impact: 'Lifting CTR to 5% adds ~30 extra clicks/week from the same search visibility — no ranking change needed.',
+    },
+    {
+        title: 'Mobile Performance Audit & Optimisation',
+        category: 'Mobile',
+        priority: 'quick-win',
+        effort: 'Small',
+        evidence: 'Mobile CTR (4.65%) is nearly double desktop (2.46%) — mobile users are more decisive but the site may not be optimised for their experience.',
+        impact: 'Core Web Vitals improvements and mobile UX fixes retain high-intent mobile visitors who are already clicking through.',
+    },
+]
+
+const opportunities28d: WebOpportunity[] = [
+    {
+        title: 'Geotechnical Industry Page — Full Content Rebuild',
+        category: 'SEO Content',
+        priority: 'high',
+        effort: 'Medium',
+        evidence: '2,108 impressions over 28 days at position #22 — the single largest missed-click opportunity on the site.',
+        impact: 'Moving from page 3 to page 1 for geotechnical queries could add 80–120 targeted clicks/month.',
+    },
+    {
+        title: 'Cathodic Protection Landing Page — Dedicated SEO Page',
+        category: 'New Page',
+        priority: 'high',
+        effort: 'Medium',
+        evidence: '435 impressions for "cathodic protection well drilling" at position #11 with 1 click — right on the edge of page 1.',
+        impact: 'A dedicated, optimised page could reach top 5 within 60 days, adding 50+ monthly clicks from a high-value B2B query.',
+    },
+    {
+        title: 'Environmental Industry Page — FAQ & Featured Snippet',
+        category: 'SEO Content',
+        priority: 'medium',
+        effort: 'Small',
+        evidence: '1,910 impressions at position #18 with 0.84% CTR — large impression volume but weak click conversion.',
+        impact: 'Adding structured FAQ content targets featured snippets and could lift CTR to 3–4%, adding 40+ monthly clicks.',
+    },
+    {
+        title: 'Homepage URL Canonicalisation',
+        category: 'Technical SEO',
+        priority: 'quick-win',
+        effort: 'Small',
+        evidence: '4 homepage variants (http/https × www/non-www) splitting impressions and link equity across separate URLs.',
+        impact: 'Consolidating to one canonical URL pools all ranking signals, improving position for the highest-traffic page on the site.',
+    },
+    {
+        title: 'Location-Specific Service Pages (NJ & PA)',
+        category: 'Local SEO',
+        priority: 'medium',
+        effort: 'Medium',
+        evidence: 'Geographic queries (Runnemede NJ, Easton PA, Jackson NJ) convert at 27–43% CTR — far above non-brand average.',
+        impact: 'Dedicated location pages rank within 60–90 days and capture project-ready local leads searching for nearby contractors.',
+    },
+]
+
+const opportunities3m: WebOpportunity[] = [
+    {
+        title: 'Geotechnical Industry Page — Comprehensive Rebuild',
+        category: 'SEO Content',
+        priority: 'high',
+        effort: 'Medium',
+        evidence: '7,233 impressions over 3 months at position #22.4 — the most-seen page in search on the entire site, generating zero clicks.',
+        impact: 'Page 1 rankings for geotechnical queries could add 200+ targeted clicks/quarter from the industry\'s core audience.',
+    },
+    {
+        title: 'Cathodic Protection Pages — Content + Link Building',
+        category: 'SEO Content',
+        priority: 'high',
+        effort: 'Medium',
+        evidence: '"Cathodic protection well drilling" — 1,402 impressions at position #11 over 3 months with only 3 clicks.',
+        impact: '2–3 quality backlinks + a content refresh could push to top 5, delivering 100+ monthly clicks from a specialist B2B query.',
+    },
+    {
+        title: 'Non-Brand Content Calendar — Sonic, Environmental & Direct Push',
+        category: 'SEO Content',
+        priority: 'high',
+        effort: 'Large',
+        evidence: 'Non-brand queries account for 50,000+ impressions quarterly but under 200 clicks — a 0.4% non-brand CTR vs 43% for brand.',
+        impact: 'A 6-month content programme targeting top non-brand queries could double organic clicks without touching brand traffic.',
+    },
+    {
+        title: 'Schema Markup — LocalBusiness & Service Types',
+        category: 'Technical SEO',
+        priority: 'quick-win',
+        effort: 'Small',
+        evidence: 'No structured data detected on industry or service pages — competitors with schema earn rich snippets that increase CTR by 20–30%.',
+        impact: 'Implementing LocalBusiness + Service schema across 10 key pages improves CTR without any ranking change required.',
+    },
+    {
+        title: 'Sonic Drilling Service Page — Targeted Optimisation',
+        category: 'SEO Content',
+        priority: 'medium',
+        effort: 'Small',
+        evidence: '"Sonic drilling services" — 736 impressions over 3 months at position #9.8, just off page 1, with only 3 clicks.',
+        impact: 'A single-page content update could push this to top 5, adding 40–60 clicks/quarter from a high-intent service query.',
+    },
+]
+
 // ─── AGGREGATE TOTALS ────────────────────────────────────────────────────────
 
 function sum(arr: number[]): number {
@@ -528,6 +653,7 @@ export const gscData: Record<GscPeriod, GscPeriodData> = {
         devices: devices7d,
         insights: insights7d,
         recommendations: recommendations7d,
+        opportunities: opportunities7d,
         summary: 'In the last 7 days, summitdrilling.com earned 112 organic clicks from 3,751 search impressions — a healthy 2.98% click-through rate. Average ranking sits at position 12.7, putting the site close to the top of page 2 on most queries. Brand searches continue to dominate clicks. The week shows strong momentum: mid-week peaks (March 6 and 11) each exceeded 23 clicks, while weekends dropped as expected for a B2B audience. The single biggest opportunity this week is the geotechnical industry page, which appeared in search 567 times without drawing a single visitor.',
     },
     '28d': {
@@ -545,6 +671,7 @@ export const gscData: Record<GscPeriod, GscPeriodData> = {
         devices: devices28d,
         insights: insights28d,
         recommendations: recommendations28d,
+        opportunities: opportunities28d,
         summary: 'Over the past 28 days, summitdrilling.com generated 447 organic clicks from 15,787 impressions (2.83% CTR). The trend tells an encouraging story: average daily position improved meaningfully from ~20 in mid-February to ~12–13 in early March. Brand queries (summit drilling, summit drilling llc) are very strong performers with 40%+ click-through rates. The month also revealed the site\'s biggest missed opportunity — the /industries/geotechnical page, which accumulated 2,108 impressions without a single click. Desktop drives most volume, but mobile achieves nearly double the CTR, confirming that mobile experience deserves investment.',
     },
     '3m': {
@@ -562,6 +689,7 @@ export const gscData: Record<GscPeriod, GscPeriodData> = {
         devices: devices3m,
         insights: insights3m,
         recommendations: recommendations3m,
+        opportunities: opportunities3m,
         summary: 'The 3-month view reveals a compelling growth story for summitdrilling.com. From 1,538 clicks across 55,843 search impressions, average position has improved dramatically from ~22 in December to ~12 in March — a 10-position gain in a single quarter. The holiday dip in late December was temporary; January surged back and February/March have seen the strongest numbers in the period. Brand visibility is exceptional. Non-brand organic — where 50,000+ impressions are still largely untapped — represents the primary growth frontier. Addressing the geotechnical and cathodic protection page gaps alone could double organic click volume within a quarter.',
     },
 }

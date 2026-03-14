@@ -15,6 +15,7 @@ import { GscQueriesTable } from '@/components/gsc/GscQueriesTable'
 import { GscPagesTable } from '@/components/gsc/GscPagesTable'
 import { GscCountriesTable } from '@/components/gsc/GscCountriesTable'
 import { GscInsights } from '@/components/gsc/GscInsights'
+import { OpportunitiesSection } from '@/components/OpportunitiesSection'
 import { gscData, type GscPeriod } from '@/lib/gscReportData'
 
 const periods: { key: GscPeriod; label: string; short: string }[] = [
@@ -220,6 +221,14 @@ export default function SearchConsolePage() {
                             <GscCountriesTable data={data.countries} />
                         </div>
                     </div>
+                </section>
+
+                {/* ── Section 6: Growth Opportunities ── */}
+                <section>
+                    <OpportunitiesSection
+                        opportunities={data.opportunities}
+                        clientName="Summit Drilling"
+                    />
                 </section>
 
                 {/* Footer */}

@@ -12,6 +12,7 @@ import { ChannelChart } from '@/components/ChannelChart'
 import { TopPagesTable } from '@/components/TopPagesTable'
 import { TopQueriesTable } from '@/components/TopQueriesTable'
 import { InsightsSection } from '@/components/InsightsSection'
+import { OpportunitiesSection } from '@/components/OpportunitiesSection'
 import { useTheme } from '@/components/ThemeProvider'
 import { reportData } from '@/lib/reportData'
 import { Period } from '@/lib/types'
@@ -200,6 +201,12 @@ export default function DashboardPage() {
 
         {/* Top Queries */}
         <TopQueriesTable data={data.topQueries} />
+
+        {/* Growth Opportunities */}
+        <OpportunitiesSection
+          opportunities={data.opportunities}
+          clientName={client.name}
+        />
 
         {/* Footer */}
         <footer className="border-t border-gray-200 dark:border-slate-800 pt-5 pb-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400 dark:text-slate-600">
