@@ -124,7 +124,15 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-gray-400 dark:text-slate-600 mt-6">
-          Powered by <span className="text-gray-500 dark:text-slate-500 font-medium">Nandann</span>
+          Powered by{' '}
+          <a
+            href="https://www.nandann.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 dark:text-slate-500 font-medium hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+          >
+            Nandann Creative Agency
+          </a>
         </p>
       </div>
     </div>
