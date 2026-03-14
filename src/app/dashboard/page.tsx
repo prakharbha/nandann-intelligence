@@ -55,7 +55,14 @@ export default function DashboardPage() {
             <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
               <BarChart2 className="w-4 h-4 text-blue-500" />
             </div>
-            <span className="text-gray-900 dark:text-white font-semibold text-sm hidden md:block flex-shrink-0">Nandann Intelligence</span>
+            <a
+              href="https://www.nandann.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-900 dark:text-white font-semibold text-sm hidden md:block flex-shrink-0 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+            >
+              Nandann Intelligence
+            </a>
             <span className="text-gray-300 dark:text-slate-600 hidden md:block">|</span>
             <a
               href={`https://${client.website}`}
