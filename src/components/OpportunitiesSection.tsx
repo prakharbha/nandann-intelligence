@@ -123,13 +123,12 @@ export function OpportunitiesSection({ opportunities, clientName }: Opportunitie
       </div>
 
       {/* Footer CTA */}
-      <div className="px-5 py-3.5 bg-gradient-to-r from-blue-500 to-violet-500 flex items-center justify-between gap-3">
-        <p className="text-white text-xs font-medium">
-          Ready to action these? Let&apos;s build a plan together.
-        </p>
+      <div className="px-5 py-3.5 bg-gradient-to-r from-blue-500 to-violet-500 flex items-center justify-end">
         <a
-          href="mailto:hello@nandann.com?subject=Growth Opportunities for summitdrilling.com"
-          className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors flex-shrink-0"
+          href="https://www.nandann.com/contact"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
         >
           Get in touch
           <ArrowUpRight className="w-3 h-3" />
