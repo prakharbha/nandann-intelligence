@@ -55,7 +55,7 @@ export function GscInsights({ insights, recommendations, summary }: Props) {
                     </div>
                     <span className="text-blue-600 dark:text-blue-400 text-sm font-semibold">Executive Summary</span>
                 </div>
-                <p className="text-gray-700 dark:text-slate-200 text-sm leading-relaxed">{summary}</p>
+                <p className="text-gray-800 dark:text-slate-100 text-base leading-relaxed">{summary}</p>
             </div>
 
             {/* Insights grid */}
@@ -76,7 +76,7 @@ export function GscInsights({ insights, recommendations, summary }: Props) {
                                             <h4 className="text-gray-900 dark:text-white text-sm font-semibold leading-tight">{insight.title}</h4>
                                             <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${c.badge}`}>{c.label}</span>
                                         </div>
-                                        <p className="text-gray-500 dark:text-slate-400 text-xs leading-relaxed">{insight.body}</p>
+                                        <p className="text-gray-700 dark:text-slate-200 text-sm leading-relaxed">{insight.body}</p>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +94,7 @@ export function GscInsights({ insights, recommendations, summary }: Props) {
                             <div className="w-5 h-5 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <span className="text-blue-500 text-xs font-bold">{i + 1}</span>
                             </div>
-                            <span className="text-gray-600 dark:text-slate-300 text-sm leading-relaxed">{rec}</span>
+                            <span className="text-gray-700 dark:text-slate-200 text-sm leading-relaxed">{rec}</span>
                         </li>
                     ))}
                 </ul>

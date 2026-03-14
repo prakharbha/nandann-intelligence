@@ -55,7 +55,7 @@ export function InsightsSection({ insights, recommendations, summary }: Insights
           </div>
           <span className="text-blue-600 dark:text-blue-400 text-sm font-semibold">AI Executive Summary</span>
         </div>
-        <p className="text-gray-700 dark:text-slate-200 text-sm leading-relaxed">{summary}</p>
+        <p className="text-gray-800 dark:text-slate-100 text-base leading-relaxed">{summary}</p>
       </div>
 
       {/* Insights grid */}
@@ -78,7 +78,7 @@ export function InsightsSection({ insights, recommendations, summary }: Insights
                         {config.label}
                       </span>
                     </div>
-                    <p className="text-gray-500 dark:text-slate-400 text-xs leading-relaxed">{insight.body}</p>
+                    <p className="text-gray-700 dark:text-slate-200 text-sm leading-relaxed">{insight.body}</p>
                   </div>
                 </div>
               </div>
@@ -94,7 +94,7 @@ export function InsightsSection({ insights, recommendations, summary }: Insights
           {recommendations.map((rec, i) => (
             <li key={i} className="flex items-start gap-3">
               <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-600 dark:text-slate-300 text-sm leading-relaxed">{rec}</span>
+              <span className="text-gray-700 dark:text-slate-200 text-sm leading-relaxed">{rec}</span>
             </li>
           ))}
         </ul>
