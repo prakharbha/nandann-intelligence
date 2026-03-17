@@ -144,10 +144,7 @@ export default function LoginPage() {
 
       {/* Right — Spline scene (hidden on mobile, visible on tablet and up) */}
       <div className="hidden sm:flex flex-1 relative bg-black/[0.96] overflow-hidden">
-        <Spotlight
-          className="-top-40 left-0 md:left-60 md:-top-20"
-          fill="white"
-        />
+        <Spotlight size={400} />
         <SplineScene
           scene="/spline-scene.splinecode"
           className="w-full h-full"
